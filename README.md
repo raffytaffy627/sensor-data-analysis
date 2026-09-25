@@ -19,7 +19,24 @@ fake sensor noise.
 
 ![Sample plot](media/sample_plot.png)
 
-## Getting started
+## Download and run (no Python required)
+
+Grab `sensor-data-analysis.exe` from the [Releases](../../releases) page -
+it opens straight into the GUI below, no install needed.
+
+## GUI: play with it live
+
+```bash
+pip install -r requirements.txt
+python3 gui_app.py
+```
+
+Sliders for noise, spike count, filter window, and threshold, with the plot
+updating in place - this is the easiest way to actually get a feel for how
+each parameter changes what gets flagged as a spike. There's a "Save plot as
+PNG" button if you want to keep a particular result.
+
+## Command-line version
 
 Requires Python 3, numpy, and matplotlib.
 
@@ -39,6 +56,10 @@ Saved plot to sensor_plot.png
 ```
 
 A window pops up with the plot, and it also gets saved to `sensor_plot.png`.
+This is the original script - fixed parameters at the top of the file,
+meant for reading the code and understanding the math. `gui_app.py` reuses
+the exact same `simulate_readings()` / `moving_average()` / `find_spikes()`
+functions, just with slider values instead of hardcoded constants.
 
 ## How it works
 
@@ -108,6 +129,22 @@ example of "here's what a library function is doing under the hood."
   of noise instead of just guessing a random number.
 - That numpy's vectorized array operations replace what would otherwise be
   slow manual for-loops over each reading.
+- How to embed a live matplotlib figure inside a tkinter window
+  (`FigureCanvasTkAgg`) instead of popping a new window every time you want
+  to see an updated plot - and that reusing the same simulation functions
+  from `sensor_analysis.py` instead of copy-pasting them into the GUI meant
+  the CLI script and the GUI can never quietly drift out of sync.
+
+## Building the exe yourself
+
+```bash
+pip install pyinstaller
+pyinstaller --onefile --name sensor-data-analysis --windowed gui_app.py
+```
+
+`--windowed` suppresses the console window since this is a GUI app - drop it
+if you want to see stdout/stderr while debugging a build. The result lands
+in `dist/`.
 
 ## Roadmap
 
