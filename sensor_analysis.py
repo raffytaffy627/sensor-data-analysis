@@ -27,17 +27,22 @@ WINDOW_SIZE = 5                  # moving average window, in samples
 SPIKE_THRESHOLD_CM = 6.0         # flag any reading this far from the moving average
 
 
-def simulate_readings():
-    """Build a noisy distance signal: a steady baseline plus sensor jitter and a few spikes."""
-    time = np.arange(NUM_SAMPLES) * SAMPLE_INTERVAL_S
+def simulate_readings(num_samples=NUM_SAMPLES, sample_interval_s=SAMPLE_INTERVAL_S,
+                       true_distance_cm=TRUE_DISTANCE_CM, noise_std_cm=NOISE_STD_CM,
+                       spike_count=SPIKE_COUNT, rng=rng):
+    """Build a noisy distance signal: a steady baseline plus sensor jitter and a few spikes.
+    Parametrized (instead of just reading the module constants directly) so gui_app.py
+    can re-run this with slider values without duplicating the simulation logic."""
+    time = np.arange(num_samples) * sample_interval_s
 
-    baseline = np.full(NUM_SAMPLES, TRUE_DISTANCE_CM)
-    noise = rng.normal(0, NOISE_STD_CM, NUM_SAMPLES)
+    baseline = np.full(num_samples, true_distance_cm)
+    noise = rng.normal(0, noise_std_cm, num_samples)
     readings = baseline + noise
 
     # sprinkle in a few spikes to simulate something briefly passing in front of the sensor
-    spike_indices = rng.choice(NUM_SAMPLES, size=SPIKE_COUNT, replace=False)
-    spike_sizes = rng.uniform(10, 25, size=SPIKE_COUNT) * rng.choice([-1, 1], size=SPIKE_COUNT)
+    spike_count = min(spike_count, num_samples)
+    spike_indices = rng.choice(num_samples, size=spike_count, replace=False)
+    spike_sizes = rng.uniform(10, 25, size=spike_count) * rng.choice([-1, 1], size=spike_count)
     readings[spike_indices] += spike_sizes
 
     # HC-SR04 can't read below ~2cm and clips near 0 on bad readings, so clamp negatives
