@@ -153,3 +153,7 @@ in `dist/`.
 - [ ] Feed in real logged data from the actual Arduino sensor instead of
       simulated noise
 - [ ] Try implementing the same pipeline in MATLAB directly and compare
+
+## License
+
+[The Rafin Hasan License](LICENSE). Use it for anything, just keep the credit :3
